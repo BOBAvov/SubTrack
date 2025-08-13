@@ -12,6 +12,7 @@ type Subscription interface {
 	GetById(id int) (sub_track.Subscription, error)
 	Update(id int, input sub_track.SubscriptionUpdate) error
 	Delete(id int) error
+	GetUnicId() ([]string, error)
 }
 
 type Repository struct {

@@ -10,10 +10,6 @@ type SubscriptionRepository struct {
 	db *sqlx.DB
 }
 
-const (
-	subsTable = "subs"
-)
-
 func NewSubPostgres(db *sqlx.DB) *SubscriptionRepository {
 	return &SubscriptionRepository{db: db}
 }
@@ -70,13 +66,13 @@ func (s *SubscriptionRepository) Update(id int, input sub_track.SubscriptionUpda
 	if input.EndDate != "" {
 		input.EndDate, err = PostgresNormalDate(input.EndDate, true)
 		if err != nil {
-			return err
+			return sub_track.NewMyError(op, err.Error())
 		}
 		query := fmt.Sprintf("UPDATE %s SET end_date = $1 WHERE id = $2", subsTable)
 		_, err := s.db.Exec(query, input.EndDate, id)
 
 		if err != nil {
-			return fmt.Errorf("%s: %w", op, err)
+			return sub_track.NewMyError(op, err.Error())
 		}
 	}
 
@@ -85,7 +81,7 @@ func (s *SubscriptionRepository) Update(id int, input sub_track.SubscriptionUpda
 		_, err := s.db.Exec(query, input.Price, id)
 
 		if err != nil {
-			return fmt.Errorf("%s: %w", op, err)
+			return sub_track.NewMyError(op, err.Error())
 		}
 	}
 
@@ -97,7 +93,28 @@ func (s *SubscriptionRepository) Delete(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", subsTable)
 	_, err := s.db.Exec(query, id)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return sub_track.NewMyError(op, err.Error())
 	}
 	return nil
+}
+
+func (s *SubscriptionRepository) GetUnicId() ([]string, error) {
+	const op = "repository.sub_postgres.getUnicId"
+	var unicIds []string
+	query := fmt.Sprintf("SELECT DISTINCT user_id FROM %s", subsTable)
+
+	if err := s.db.Select(&unicIds, query); err != nil {
+		return nil, sub_track.NewMyError(op, err.Error())
+	}
+	return unicIds, nil
+}
+
+func (s *SubscriptionRepository) GetUnicServiceName() ([]string, error) {
+	const op = "repository.sub_postgres.getUnicServiceName"
+	var unicServiceName []string
+	query := fmt.Sprintf("SELECT DISTINCT service_name FROM %s", subsTable)
+	if err := s.db.Select(&unicServiceName, query); err != nil {
+		return nil, sub_track.NewMyError(op, err.Error())
+	}
+	return unicServiceName, nil
 }

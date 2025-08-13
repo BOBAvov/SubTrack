@@ -13,3 +13,10 @@ type SubscriptionUpdate struct {
 	Price   int    `json:"price" db:"price"`
 	EndDate string `json:"end_date" db:"end_date"`
 }
+
+type SumResponse struct {
+	StartDate    string   `json:"start_date" binding:"required" db:"start_date"`
+	EndDate      string   `json:"end_date"  binding:"required" db:"end_date"`
+	UsersId      []int    `json:"users_id"`
+	ServicesName []string `json:"services_name"`
+}

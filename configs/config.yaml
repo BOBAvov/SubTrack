@@ -1,8 +1,7 @@
-#configs/config.yaml
 port : "8080"
 db :
-    host: "localhost"
-    port: "5436"
+    host: "todo-db"
+    port: "5432"
     username: "postgres"
     password: "qwerty" 
     dbname: "postgres"

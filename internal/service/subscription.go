@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/BOBAvov/sub_track"
 	"github.com/BOBAvov/sub_track/internal/repository"
+	"log/slog"
 )
 
 type SubscriptionService struct {
 	repo repository.Subscription
+	log  *slog.Logger
 }
 
 func NewSubscriptionService(repo repository.Subscription) *SubscriptionService {
@@ -15,7 +17,12 @@ func NewSubscriptionService(repo repository.Subscription) *SubscriptionService {
 }
 
 func (s *SubscriptionService) Create(input sub_track.Subscription) (id int, err error) {
-	return s.repo.Create(input)
+	id, err = s.repo.Create(input)
+	if err != nil {
+		s.log.Error(err.Error())
+		return id, err
+	}
+	return id, nil
 }
 
 func (s *SubscriptionService) GetAll() ([]sub_track.Subscription, error) {
@@ -34,5 +41,6 @@ func (s *SubscriptionService) Update(id int, input sub_track.SubscriptionUpdate)
 	return s.repo.Update(id, input)
 }
 func (s *SubscriptionService) Delete(id int) error {
+
 	return s.repo.Delete(id)
 }

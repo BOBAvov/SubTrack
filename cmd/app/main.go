@@ -1,4 +1,3 @@
-// cmd/app/main
 package main
 
 import (
@@ -33,7 +32,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("database disconnect", err)
+		log.Fatalf("database disconnect %w", err)
 	}
 
 	logger.Info("database connect success")
@@ -51,9 +50,10 @@ func main() {
 	}()
 
 	logger.Info("server run success")
-	kill_ch := make(chan os.Signal, 1)
-	signal.Notify(kill_ch, syscall.SIGINT, syscall.SIGTERM)
-	<-kill_ch
+	killCh := make(chan os.Signal, 1)
+	signal.Notify(killCh, syscall.SIGINT, syscall.SIGTERM)
+
+	<-killCh
 
 	logger.Info("shutting down server...")
 
